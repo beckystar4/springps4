@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 
 public class GameRequest {
+    @JsonProperty
+    private String game_id;
 
     @JsonProperty
     private String title;
@@ -19,6 +21,14 @@ public class GameRequest {
     private LocalDate release_date;
 
     public GameRequest() {
+    }
+
+    public String getGame_id() {
+        return game_id;
+    }
+
+    public void setGame_id(String game_id) {
+        this.game_id = game_id;
     }
 
     public String getTitle() {
