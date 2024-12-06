@@ -9,7 +9,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
 
-public class AbstractDatabaseDao {
+public abstract class AbstractDatabaseDao {
     protected final DataSource dataSource;
     protected final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     protected final JdbcTemplate jdbcTemplate;
