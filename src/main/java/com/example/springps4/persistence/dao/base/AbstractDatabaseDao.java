@@ -15,10 +15,10 @@ public abstract class AbstractDatabaseDao {
     protected final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public AbstractDatabaseDao(DataSource dataSource, NamedParameterJdbcTemplate namedParameterJdbcTemplate, JdbcTemplate jdbcTemplate) {
+    public AbstractDatabaseDao(DataSource dataSource) {
         this.dataSource = dataSource;
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-        this.jdbcTemplate = jdbcTemplate;
+        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     protected void addSearchParams(MapSqlParameterSource queryParams, SearchRequest searchRequest){
