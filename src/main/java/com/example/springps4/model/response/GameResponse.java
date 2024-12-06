@@ -63,5 +63,4 @@ public class GameResponse {
     public void setRelease_date(LocalDate release_date) {
         this.release_date = release_date;
     }
-
 }
