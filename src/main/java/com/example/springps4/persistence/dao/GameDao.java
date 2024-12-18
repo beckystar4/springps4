@@ -5,6 +5,7 @@ import com.example.springps4.model.request.GameRequest;
 import com.example.springps4.model.response.GameResponse;
 import com.example.springps4.persistence.dao.base.AbstractDatabaseDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
@@ -25,9 +26,14 @@ public class GameDao extends AbstractDatabaseDao {
             SELECT * from game where title= :title;
             """;
 
-    public List<GameResponse> getAllGameDetails(GameRequest gameRequest){
+    public GameResponse getGameDetailsByTitle(String title){
         MapSqlParameterSource queryParams = new MapSqlParameterSource();
-        queryParams.addValue("title", gameRequest.getGame_id());
-        return namedParameterJdbcTemplate.query(SELECT_GAME_DETAILS, queryParams, gameMapper);
+        queryParams.addValue("title", title);
+        try {
+            return namedParameterJdbcTemplate.queryForObject(SELECT_GAME_DETAILS, queryParams, gameMapper);
+        } catch (EmptyResultDataAccessException e) {
+            // Handle case where no game was found
+            return null; // or a default response
+        }
     }
 }
