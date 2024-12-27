@@ -1,12 +1,13 @@
 package com.example.springps4.model.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.annotation.Id;
 
 import java.time.LocalDate;
 
 public class GameRequest {
-    @JsonProperty
-    private String game_id;
+    @Id
+    private Long game_id;
 
     @JsonProperty
     private String title;
@@ -20,14 +21,11 @@ public class GameRequest {
     @JsonProperty
     private LocalDate release_date;
 
-    public GameRequest() {
-    }
-
-    public String getGame_id() {
+    public Long getGame_id() {
         return game_id;
     }
 
-    public void setGame_id(String game_id) {
+    public void setGame_id(Long game_id) {
         this.game_id = game_id;
     }
 
@@ -61,5 +59,16 @@ public class GameRequest {
 
     public void setRelease_date(LocalDate release_date) {
         this.release_date = release_date;
+    }
+
+    @Override
+    public String toString() {
+        return "GameRequest{" +
+                "game_id='" + game_id + '\'' +
+                ", title='" + title + '\'' +
+                ", genres='" + genres + '\'' +
+                ", millions_of_copies_sold=" + millions_of_copies_sold +
+                ", release_date=" + release_date +
+                '}';
     }
 }
