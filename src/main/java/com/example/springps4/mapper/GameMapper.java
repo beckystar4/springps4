@@ -13,6 +13,7 @@ public class GameMapper implements RowMapper<GameResponse> {
     @Override
     public GameResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
         GameResponse gameResponse = new GameResponse();
+        gameResponse.setGame_id(rs.getLong("game_id"));
         gameResponse.setTitle(rs.getString("title"));
         gameResponse.setGenres(rs.getString("genres"));
         gameResponse.setMillions_of_copies_sold(rs.getInt("millions_of_copies_sold"));

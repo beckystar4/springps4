@@ -1,8 +1,6 @@
 package com.example.springps4.utility;
 
 import java.time.LocalDate;
-import java.sql.Date;
-
 
 public class DateTimeUtil {
 
@@ -14,5 +12,5 @@ public class DateTimeUtil {
         return java.sql.Date.valueOf(localDate);
     }
 
-
+    private DateTimeUtil(){}
 }

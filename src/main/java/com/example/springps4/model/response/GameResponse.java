@@ -7,7 +7,7 @@ import java.time.LocalDate;
 public class GameResponse {
 
     @JsonProperty
-    private Integer game_id;
+    private Long game_id;
 
     @JsonProperty
     private String title;
@@ -21,14 +21,11 @@ public class GameResponse {
     @JsonProperty
     private LocalDate release_date;
 
-    public GameResponse() {
-    }
-
-    public Integer getGame_id() {
+    public Long getGame_id() {
         return game_id;
     }
 
-    public void setGame_id(Integer game_id) {
+    public void setGame_id(Long game_id) {
         this.game_id = game_id;
     }
 
