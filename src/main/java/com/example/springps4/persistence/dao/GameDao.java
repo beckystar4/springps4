@@ -17,10 +17,6 @@ public class GameDao extends AbstractDatabaseDao {
             SELECT * from games where title=:title;
             """;
 
-    private static final String SELECT_GAME_ID_BY_TITLE = """
-            SELECT game_id from games where title=:title;
-            """;
-
     private final GameMapper gameMapper;
 
     @Autowired
@@ -30,12 +26,6 @@ public class GameDao extends AbstractDatabaseDao {
     }
 
     public GameResponse getGameDetailsByTitle(String title){
-        MapSqlParameterSource queryParams = new MapSqlParameterSource();
-        queryParams.addValue("title", title);
-        return namedParameterJdbcTemplate.queryForObject(SELECT_GAME_DETAILS,queryParams,gameMapper);
-    }
-
-    public GameResponse getGameIdByTitle(String title){
         MapSqlParameterSource queryParams = new MapSqlParameterSource();
         queryParams.addValue("title", title);
         return namedParameterJdbcTemplate.queryForObject(SELECT_GAME_DETAILS,queryParams,gameMapper);

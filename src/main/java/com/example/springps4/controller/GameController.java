@@ -29,13 +29,13 @@ public class GameController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
     }
-
-    @GetMapping("/id/{title}")
-    public ResponseEntity<Long> getGameIdByTitle(
-            @PathVariable String title
-    ){
-        return Optional.ofNullable(service.getGameIdByTitle(title))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build());
-    }
+//
+//    @GetMapping("/ids/{title}")
+//    public ResponseEntity<Long> getGameIdByTitle(
+//            @PathVariable String title
+//    ){
+//        return Optional.ofNullable(service.getGameIdByTitle(title))
+//                .map(ResponseEntity::ok)
+//                .orElse(ResponseEntity.noContent().build());
+//    }
 }

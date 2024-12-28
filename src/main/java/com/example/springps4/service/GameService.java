@@ -19,8 +19,8 @@ public class GameService {
     public GameResponse getGameDetailsByTitle(String title){
         return gameDao.getGameDetailsByTitle(title);
     }
-
-    public Long getGameIdByTitle(String title){
-        return gameDao.getGameIdByTitle(title).getGame_id();
-    }
+//
+//    public Long getGameIdByTitle(String title){
+//        return gameDao.getGameIdByTitle(title).getGame_id();
+//    }
 }
