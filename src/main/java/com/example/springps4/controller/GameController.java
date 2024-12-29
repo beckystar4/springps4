@@ -1,5 +1,6 @@
 package com.example.springps4.controller;
 
+import com.example.springps4.model.request.GameRequest;
 import com.example.springps4.model.response.GameResponse;
 import com.example.springps4.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,17 @@ public class GameController {
                 .orElse(ResponseEntity.noContent().build());
     }
 
-//    @GetMapping("/ids/{title}")
+    @GetMapping("/id={game_id}")
+    public ResponseEntity<GameResponse> getGameDetailsById(
+            @PathVariable Long game_id
+    ){
+        return Optional.ofNullable(service.getGameDetailsById(game_id))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
+
+    //    @GetMapping("/ids/{title}")
 //    public ResponseEntity<Long> getGameIdByTitle(
 //            @PathVariable String title
 //    ){
@@ -76,5 +87,36 @@ public class GameController {
                 .filter(genres -> !CollectionUtils.isEmpty(genres))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
+    }
+
+    /*
+    Will update game with all the details provided by user in one transaction.
+    Example: if the user only puts name and release date, then only those two things will be updated
+     */
+    @PutMapping("/{game_id}")
+    public ResponseEntity<String> updateEverythingByGameId(
+            @PathVariable Long game_id,
+            @RequestBody GameRequest updateGameRequest
+    ){
+        int rowsAffected = service.updateGameDetails(game_id, updateGameRequest);
+        if (rowsAffected > 0){
+            return ResponseEntity.ok("Game details were updated successfully.");
+        }
+        else {
+            return ResponseEntity.noContent().build();
+        }
+    }
+
+    @DeleteMapping("/{game_id}")
+    public ResponseEntity<String> deleteGameByGameId(
+            @PathVariable Long game_id
+    ){
+        int rowsAffected = service.deleteGameById(game_id);
+        if (rowsAffected == 1){
+            return ResponseEntity.ok("Game with id: " + game_id + " deleted successfully.");
+        }
+        else {
+            return ResponseEntity.noContent().build();
+        }
     }
 }
