@@ -19,8 +19,12 @@ public class GameService {
     public GameResponse getGameDetailsByTitle(String title){
         return gameDao.getGameDetailsByTitle(title);
     }
-//
-//    public Long getGameIdByTitle(String title){
-//        return gameDao.getGameIdByTitle(title).getGame_id();
-//    }
+
+    public List<String> getAllGameTitles(){return gameDao.getGameTitles();}
+
+    public List<String> getAllTitlesCopiesSold(){return gameDao.getGameTitlesCopiesSold();}
+
+    public List<String> getTitlesSortByReleaseDate(){return gameDao.getTitlesSortByReleaseDate();}
+
+    public List<String> getDistinctGenres(){return gameDao.getDistinctGenres();}
 }

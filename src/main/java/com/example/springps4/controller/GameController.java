@@ -29,7 +29,7 @@ public class GameController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
     }
-//
+
 //    @GetMapping("/ids/{title}")
 //    public ResponseEntity<Long> getGameIdByTitle(
 //            @PathVariable String title
@@ -38,4 +38,36 @@ public class GameController {
 //                .map(ResponseEntity::ok)
 //                .orElse(ResponseEntity.noContent().build());
 //    }
+
+    @GetMapping("/titles")
+    public ResponseEntity<List<String>> getAllGameTitles(){
+        return Optional.ofNullable(service.getAllGameTitles())
+                .filter(titles -> !CollectionUtils.isEmpty(titles))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/titles-copies-sold")
+    public ResponseEntity<List<String>> getAllTitlesCopiesSold(){
+        return Optional.ofNullable(service.getAllTitlesCopiesSold())
+                .filter(titles -> !CollectionUtils.isEmpty(titles))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/titles-release-date")
+    public ResponseEntity<List<String>> getTitlesSortByReleaseDate(){
+        return Optional.ofNullable(service.getTitlesSortByReleaseDate())
+                .filter(titles -> !CollectionUtils.isEmpty(titles))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/genres")
+    public ResponseEntity<List<String>> getDistinctGenres(){
+        return Optional.ofNullable(service.getDistinctGenres())
+                .filter(genres -> !CollectionUtils.isEmpty(genres))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
 }
