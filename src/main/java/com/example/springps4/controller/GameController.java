@@ -38,6 +38,13 @@ public class GameController {
 //                .map(ResponseEntity::ok)
 //                .orElse(ResponseEntity.noContent().build());
 //    }
+    @GetMapping
+    public ResponseEntity<List<GameResponse>> getAllGames(){
+        return Optional.ofNullable(service.getAllGames())
+                .filter(titles -> !CollectionUtils.isEmpty(titles))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
 
     @GetMapping("/titles")
     public ResponseEntity<List<String>> getAllGameTitles(){

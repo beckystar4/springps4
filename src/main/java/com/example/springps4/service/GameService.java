@@ -22,6 +22,8 @@ public class GameService {
 
     public List<String> getAllGameTitles(){return gameDao.getGameTitles();}
 
+    public List<GameResponse> getAllGames(){return gameDao.getGames();}
+
     public List<String> getAllTitlesCopiesSold(){return gameDao.getGameTitlesCopiesSold();}
 
     public List<String> getTitlesSortByReleaseDate(){return gameDao.getTitlesSortByReleaseDate();}

@@ -4,7 +4,6 @@ import com.example.springps4.mapper.GameMapper;
 import com.example.springps4.model.response.GameResponse;
 import com.example.springps4.persistence.dao.base.AbstractDatabaseDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
@@ -17,11 +16,11 @@ import java.util.stream.IntStream;
 @Component
 public class GameDao extends AbstractDatabaseDao {
 
-    private static final String SELECT_GAME_DETAILS = """
+    private static final String SELECT_GAME_BY_TITLE = """
             SELECT * FROM games WHERE title=:title;
             """;
 
-    private static final String SELECT_ALL_TITLES = """
+    private static final String SELECT_GAMES_DETAILS = """
             SELECT * FROM games;
             """;
 
@@ -44,24 +43,29 @@ public class GameDao extends AbstractDatabaseDao {
     public GameResponse getGameDetailsByTitle(String title){
         MapSqlParameterSource queryParams = new MapSqlParameterSource();
         queryParams.addValue("title", title);
-        return namedParameterJdbcTemplate.queryForObject(SELECT_GAME_DETAILS,queryParams,gameMapper);
+        return namedParameterJdbcTemplate.queryForObject(SELECT_GAME_BY_TITLE,queryParams,gameMapper);
     }
 
     /*
     .map(GameResponse::getTitle) maps each GameResponse object to just its title.
     .collect(Collectors.toList()) collects the result into a new list of strings containing just the titles.
+    jdbcTemplate is used here instead of namedParameterJdbcTemplate because there is no request parameters.
     */
     public List<String> getGameTitles(){
-        List<GameResponse> titles = jdbcTemplate.query(SELECT_ALL_TITLES, gameMapper);
+        List<GameResponse> titles = jdbcTemplate.query(SELECT_GAMES_DETAILS, gameMapper);
 
         return titles.stream()
                 .map(GameResponse::getTitle)
                 .collect(Collectors.toList());
     }
 
+    public List<GameResponse> getGames(){
+        return jdbcTemplate.query(SELECT_GAMES_DETAILS, gameMapper);
+    }
+
     // IntStream.range to iterate through both lists simultaneously (since you have two separate lists, you need to align them by index
     public List<String> getGameTitlesCopiesSold(){
-        List<GameResponse> games = jdbcTemplate.query(SELECT_ALL_TITLES, gameMapper);
+        List<GameResponse> games = jdbcTemplate.query(SELECT_GAMES_DETAILS, gameMapper);
 
         List<String> titles =  games.stream()
                 .map(GameResponse::getTitle)
