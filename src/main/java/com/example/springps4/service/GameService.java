@@ -35,6 +35,8 @@ public class GameService {
 
     public List<String> getDistinctGenres(){return gameDao.getDistinctGenres();}
 
+    public Integer insertGames(GameRequest gameRequest){return gameDao.insertGame(gameRequest);}
+
     public Integer updateGameDetails(Long game_id, GameRequest gameRequest){return gameDao.updateGameDetails(game_id,gameRequest);}
 
     public Integer deleteGameById(Long game_id){return gameDao.deleteGameById(game_id);}

@@ -89,6 +89,24 @@ public class GameController {
                 .orElse(ResponseEntity.noContent().build());
     }
 
+    //Genres and copies_sold can be null, Title and Release_date cannot be. Additionally title must be unique
+    @PostMapping("/add-games")
+    public ResponseEntity<String> saveGameDetails(@RequestBody GameRequest gameRequest){
+        if (gameRequest.getTitle() != null && gameRequest.getRelease_date() != null){
+            System.out.println("Trying to save...");
+            if (service.insertGames(gameRequest) > 0){
+                return ResponseEntity.ok("Game details were saved successfully.");
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Failed to save game details. Please try again.");
+            }
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Title and Release Date must not be null.");
+        }
+    }
+
     /*
     Will update game with all the details provided by user in one transaction.
     Example: if the user only puts name and release date, then only those two things will be updated

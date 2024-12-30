@@ -5,6 +5,7 @@ import com.example.springps4.model.request.GameRequest;
 import com.example.springps4.model.response.GameResponse;
 import com.example.springps4.persistence.dao.base.AbstractDatabaseDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +40,11 @@ public class GameDao extends AbstractDatabaseDao {
 
     private static final String INSERT_GAMES = """
             INSERT INTO games (title, genres, millions_of_copies_sold, release_date) 
-            VALUES (':title', ':genres', :millions_of_copies_sold, 'release_date');
+            VALUES (:title, :genres, :millions_of_copies_sold, :release_date);
+            """;
+
+    private static final String CHECK_IF_TITLE_EXISTS = """
+            SELECT COUNT(*) FROM games WHERE title=:title;
             """;
 
     private static final String UPDATE_GAME_NAME = """
@@ -194,6 +199,30 @@ public class GameDao extends AbstractDatabaseDao {
         }
         else{
             return 0;
+        }
+    }
+
+    public Integer insertGame(GameRequest gameRequest){
+        MapSqlParameterSource queryParams = new MapSqlParameterSource();
+        GameResponse gameResponse = new GameResponse();
+
+        String title = gameRequest.getTitle();
+        queryParams.addValue("title", title);
+
+        String genres = gameRequest.getGenres();
+        Integer copies_sold = gameRequest.getMillions_of_copies_sold();
+        LocalDate release_date = gameRequest.getRelease_date();
+        queryParams.addValue("genres", genres);
+        queryParams.addValue("millions_of_copies_sold", copies_sold);
+        queryParams.addValue("release_date", release_date);
+        try {
+            // Attempt to insert the game into the database
+            return namedParameterJdbcTemplate.update(INSERT_GAMES, queryParams);
+        } catch (DuplicateKeyException e) {
+            // Handle the case where the title already exists
+            // Log the exception or handle it gracefully
+            System.out.println("Error: Duplicate title, insertion failed.");
+            return 0; // Return 0 to indicate failure due to duplicate title
         }
     }
 
