@@ -1,8 +1,6 @@
 package com.example.springps4.controller;
-
-import com.example.springps4.model.request.GameRequest;
+;
 import com.example.springps4.model.request.PublisherRequest;
-import com.example.springps4.model.response.GameResponse;
 import com.example.springps4.model.response.PublisherResponse;
 import com.example.springps4.service.PublisherService;
 import org.springframework.beans.factory.annotation.Autowired;
