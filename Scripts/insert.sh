@@ -23,6 +23,20 @@ MAIN_MENU(){
         echo -e "\n~~~~DEVELOPER INSERTION FAILED~~~~\n"
         exit 1
     fi
+
+    VALIDATION=$($PSQL "SELECT COUNT(*) from games;" 2>&1)
+   # Check if the query succeeded
+   if [[ $? -ne 0 ]]; then
+       echo "Error executing query: $VALIDATION"
+       exit 1
+   fi
+
+   if [[ "$VALIDATION" == "32" ]]; then
+       echo -e "\n~~~~PS4 INSERT SUCCESSFUL~~~~\n"
+   else
+       echo -e "\n~~~~PS4 INSERT FAILED~~~~\n"
+       echo "Expected 32 games, but found $VALIDATION games."
+   fi
 }
 
 INSERT_GAMES(){
