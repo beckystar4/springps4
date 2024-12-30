@@ -91,20 +91,24 @@ public class GameController {
 
     //Genres and copies_sold can be null, Title and Release_date cannot be. Additionally title must be unique
     @PostMapping("/add-games")
-    public ResponseEntity<String> saveGameDetails(@RequestBody GameRequest gameRequest){
-        if (gameRequest.getTitle() != null && gameRequest.getRelease_date() != null){
-            System.out.println("Trying to save...");
-            if (service.insertGames(gameRequest) > 0){
-                return ResponseEntity.ok("Game details were saved successfully.");
+    public ResponseEntity<String> saveGameDetails(@RequestBody List<GameRequest> gameRequests) {
+        if (gameRequests == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("No games provided. Please provide at least one game.");
+        }
+        for (GameRequest gameRequest : gameRequests) {
+            if (gameRequest.getTitle() == null && gameRequest.getRelease_date() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Title and Release Date must not be null.");
             }
-            else {
+
+            System.out.println("Trying to save...");
+            if (service.insertGames(gameRequest) <= 0) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("Failed to save game details. Please try again.");
             }
-        }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Title and Release Date must not be null.");
         }
+        return ResponseEntity.ok("All game details were saved successfully.");
     }
 
     /*
