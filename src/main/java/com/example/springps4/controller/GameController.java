@@ -117,11 +117,17 @@ public class GameController {
             @RequestBody GameRequest updateGameRequest
     ){
         int rowsAffected = service.updateGameDetails(game_id, updateGameRequest);
-        if (rowsAffected > 0){
-            return ResponseEntity.ok("Game details were updated successfully.");
-        }
-        else {
-            return ResponseEntity.noContent().build();
+        if (rowsAffected == -100){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error. Possible causes: DuplicateKeyException .");
+        } else{
+            if (rowsAffected > 0){
+                return ResponseEntity.ok("Game details were updated successfully.");
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Failed to Updated.");
+            }
         }
     }
 
