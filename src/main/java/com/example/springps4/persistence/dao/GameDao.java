@@ -1,9 +1,11 @@
 package com.example.springps4.persistence.dao;
 
 import com.example.springps4.mapper.GameMapper;
+import com.example.springps4.model.request.GameRequest;
 import com.example.springps4.model.response.GameResponse;
 import com.example.springps4.persistence.dao.base.AbstractDatabaseDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
@@ -20,8 +22,12 @@ public class GameDao extends AbstractDatabaseDao {
             SELECT * FROM games WHERE title=:title;
             """;
 
+    private static final String SELECT_GAME_BY_ID = """
+            SELECT * FROM games WHERE game_id=:game_id;
+            """;
+
     private static final String SELECT_GAMES_DETAILS = """
-            SELECT * FROM games;
+            SELECT * FROM games ORDER BY game_id;
             """;
 
     private static final String SELECT_ALL_BY_RELEASE_DATE = """
@@ -30,6 +36,39 @@ public class GameDao extends AbstractDatabaseDao {
 
     private static final String SELECT_DISTINCT_GENRES = """
             SELECT DISTINCT genres FROM games ORDER BY genres ASC;
+            """;
+
+    private static final String INSERT_GAMES = """
+            INSERT INTO games (title, genres, millions_of_copies_sold, release_date) 
+            VALUES (:title, :genres, :millions_of_copies_sold, :release_date);
+            """;
+
+    private static final String CHECK_IF_TITLE_EXISTS = """
+            SELECT COUNT(*) FROM games WHERE title=:title;
+            """;
+
+    private static final String UPDATE_GAME_NAME = """
+            UPDATE games SET title=:title WHERE game_id=:game_id;
+            """;
+
+    private static final String UPDATE_GAME_GENRE = """
+            UPDATE games SET genres=:genres WHERE game_id=:game_id;
+            """;
+
+    private static final String UPDATE_GAME_COPIES_SOLD = """
+            UPDATE games SET millions_of_copies_sold=:millions_of_copies_sold WHERE game_id=:game_id;
+            """;
+
+    private static final String UPDATE_GAME_RELEASE_DATE = """
+            UPDATE games SET release_date=:release_date WHERE game_id=:game_id;
+            """;
+
+    private static final String UPDATE_ALL_GAME_DETAILS = """
+            UPDATE games SET title=:title, genres=:genres, millions_of_copies_sold=:millions_of_copies_sold, release_date=:release_date WHERE game_id=:game_id;
+            """;
+
+    private static final String DELETE_GAME_BY_ID = """
+            DELETE FROM games WHERE game_id=:game_id;
             """;
 
     private final GameMapper gameMapper;
@@ -44,6 +83,12 @@ public class GameDao extends AbstractDatabaseDao {
         MapSqlParameterSource queryParams = new MapSqlParameterSource();
         queryParams.addValue("title", title);
         return namedParameterJdbcTemplate.queryForObject(SELECT_GAME_BY_TITLE,queryParams,gameMapper);
+    }
+
+    public GameResponse getGameDetailsById(Long id){
+        MapSqlParameterSource queryParams = new MapSqlParameterSource();
+        queryParams.addValue("game_id", id);
+        return namedParameterJdbcTemplate.queryForObject(SELECT_GAME_BY_ID,queryParams,gameMapper);
     }
 
     /*
@@ -99,5 +144,117 @@ public class GameDao extends AbstractDatabaseDao {
     // Uses its own Mapper in order to select distinct genres and not cause mapping errors.
     public List<String> getDistinctGenres(){
         return jdbcTemplate.query(SELECT_DISTINCT_GENRES, (rs, rowNum) -> rs.getString("genres"));
+    }
+
+    public Integer updateGameDetails(Long game_id, GameRequest updatedGameRequest){
+        MapSqlParameterSource queryParams = new MapSqlParameterSource();
+        queryParams.addValue("game_id", game_id);
+
+        int parametersToBeUpdated = 0;
+        int rowsAffected = 0;
+
+        String title = updatedGameRequest.getTitle();
+        String genres = updatedGameRequest.getGenres();
+        Integer copies_sold = updatedGameRequest.getMillions_of_copies_sold();
+        LocalDate release_date = updatedGameRequest.getRelease_date();
+
+        // FIx isEmpty
+        if((title != null) && (genres != null)
+        && (copies_sold != null) && ((release_date != null))){
+            queryParams.addValue("title", title);
+            queryParams.addValue("genres", genres);
+            queryParams.addValue("millions_of_copies_sold", copies_sold);
+            queryParams.addValue("release_date", release_date);
+            try {
+                // Attempt to insert the game into the database
+                namedParameterJdbcTemplate.update(UPDATE_ALL_GAME_DETAILS,queryParams);
+                parametersToBeUpdated=4;
+                rowsAffected=4;
+            } catch (DuplicateKeyException e) {
+                // Handle the case where the title already exists
+                // Log the exception or handle it gracefully
+                System.out.println("Error: Game with Title already exists.");
+                return 0; // Return 0 to indicate failure due to duplicate title
+            }
+        } else {
+            if (title != null) {
+                queryParams.addValue("title", title);
+                parametersToBeUpdated+=1;
+                try {
+                    // Attempt to insert the game into the database
+                    namedParameterJdbcTemplate.update(UPDATE_GAME_NAME,queryParams);
+                    rowsAffected+=1;
+                } catch (DuplicateKeyException e) {
+                    // Handle the case where the title already exists
+                    // Log the exception or handle it gracefully
+                    System.out.println("Error: Game with Title already exists.");
+                    return -100; // Return 0 to indicate failure due to duplicate title
+                }
+            }
+            if (genres != null) {
+                queryParams.addValue("genres", genres);
+                parametersToBeUpdated+=1;
+                if (namedParameterJdbcTemplate.update(UPDATE_GAME_GENRE,queryParams) > 0){
+                    rowsAffected+=1;
+                }
+            }
+            if (copies_sold != null) {
+                queryParams.addValue("millions_of_copies_sold", copies_sold);
+                parametersToBeUpdated+=1;
+                if (namedParameterJdbcTemplate.update(UPDATE_GAME_GENRE,queryParams) > 0){
+                    rowsAffected+=1;
+                }
+            }
+            if (release_date != null) {
+                queryParams.addValue("release_date", release_date);
+                parametersToBeUpdated += 1;
+                if (namedParameterJdbcTemplate.update(UPDATE_GAME_GENRE, queryParams) > 0) {
+                    rowsAffected += 1;
+                }
+            }
+        }
+
+        if (parametersToBeUpdated==rowsAffected){
+            return rowsAffected;
+        }
+        else{
+            return 0;
+        }
+    }
+
+    public Integer insertGame(GameRequest gameRequest){
+        MapSqlParameterSource queryParams = new MapSqlParameterSource();
+        GameResponse gameResponse = new GameResponse();
+
+        String title = gameRequest.getTitle();
+        queryParams.addValue("title", title);
+
+        String genres = gameRequest.getGenres();
+        Integer copies_sold = gameRequest.getMillions_of_copies_sold();
+        LocalDate release_date = gameRequest.getRelease_date();
+        queryParams.addValue("genres", genres);
+        queryParams.addValue("millions_of_copies_sold", copies_sold);
+        queryParams.addValue("release_date", release_date);
+        try {
+            // Attempt to insert the game into the database
+            return namedParameterJdbcTemplate.update(INSERT_GAMES, queryParams);
+        } catch (DuplicateKeyException e) {
+            // Handle the case where the title already exists
+            // Log the exception or handle it gracefully
+            System.out.println("Error: Duplicate title, insertion failed.");
+            return 0; // Return 0 to indicate failure due to duplicate title
+        }
+    }
+
+    public Integer deleteGameById(Long id){
+        MapSqlParameterSource queryParams = new MapSqlParameterSource();
+        queryParams.addValue("game_id", id);
+
+        if (namedParameterJdbcTemplate.update(DELETE_GAME_BY_ID,queryParams) > 0){
+            return 1;
+        }
+        else{
+            return 0;
+        }
     }
 }

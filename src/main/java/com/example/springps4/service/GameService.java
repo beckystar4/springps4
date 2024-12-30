@@ -1,5 +1,6 @@
 package com.example.springps4.service;
 
+import com.example.springps4.model.request.GameRequest;
 import com.example.springps4.model.response.GameResponse;
 import com.example.springps4.persistence.dao.GameDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,10 @@ public class GameService {
         return gameDao.getGameDetailsByTitle(title);
     }
 
+    public GameResponse getGameDetailsById(Long id){
+        return gameDao.getGameDetailsById(id);
+    }
+
     public List<String> getAllGameTitles(){return gameDao.getGameTitles();}
 
     public List<GameResponse> getAllGames(){return gameDao.getGames();}
@@ -29,4 +34,11 @@ public class GameService {
     public List<String> getTitlesSortByReleaseDate(){return gameDao.getTitlesSortByReleaseDate();}
 
     public List<String> getDistinctGenres(){return gameDao.getDistinctGenres();}
+
+    public Integer insertGames(GameRequest gameRequest){return gameDao.insertGame(gameRequest);}
+
+    public Integer updateGameDetails(Long game_id, GameRequest gameRequest){return gameDao.updateGameDetails(game_id,gameRequest);}
+
+    public Integer deleteGameById(Long game_id){return gameDao.deleteGameById(game_id);}
+
 }

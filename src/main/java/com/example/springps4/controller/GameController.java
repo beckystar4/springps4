@@ -1,5 +1,6 @@
 package com.example.springps4.controller;
 
+import com.example.springps4.model.request.GameRequest;
 import com.example.springps4.model.response.GameResponse;
 import com.example.springps4.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,17 @@ public class GameController {
                 .orElse(ResponseEntity.noContent().build());
     }
 
-//    @GetMapping("/ids/{title}")
+    @GetMapping("/id={game_id}")
+    public ResponseEntity<GameResponse> getGameDetailsById(
+            @PathVariable Long game_id
+    ){
+        return Optional.ofNullable(service.getGameDetailsById(game_id))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
+
+    //    @GetMapping("/ids/{title}")
 //    public ResponseEntity<Long> getGameIdByTitle(
 //            @PathVariable String title
 //    ){
@@ -76,5 +87,64 @@ public class GameController {
                 .filter(genres -> !CollectionUtils.isEmpty(genres))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
+    }
+
+    //Genres and copies_sold can be null, Title and Release_date cannot be. Additionally title must be unique
+    @PostMapping("/add-games")
+    public ResponseEntity<String> saveGameDetails(@RequestBody List<GameRequest> gameRequests) {
+        if (gameRequests == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("No games provided. Please provide at least one game.");
+        }
+        for (GameRequest gameRequest : gameRequests) {
+            if (gameRequest.getTitle() == null && gameRequest.getRelease_date() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Title and Release Date must not be null.");
+            }
+
+            System.out.println("Trying to save...");
+            if (service.insertGames(gameRequest) <= 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Failed to save game details. Please try again.");
+            }
+        }
+        return ResponseEntity.ok("All game details were saved successfully.");
+    }
+
+    /*
+    Will update game with all the details provided by user in one transaction.
+    Example: if the user only puts name and release date, then only those two things will be updated
+     */
+    @PutMapping("/{game_id}")
+    public ResponseEntity<String> updateEverythingByGameId(
+            @PathVariable Long game_id,
+            @RequestBody GameRequest updateGameRequest
+    ){
+        int rowsAffected = service.updateGameDetails(game_id, updateGameRequest);
+        if (rowsAffected == -100){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error. Possible causes: DuplicateKeyException .");
+        } else{
+            if (rowsAffected > 0){
+                return ResponseEntity.ok("Game details were updated successfully.");
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Failed to Updated.");
+            }
+        }
+    }
+
+    @DeleteMapping("/{game_id}")
+    public ResponseEntity<String> deleteGameByGameId(
+            @PathVariable Long game_id
+    ){
+        int rowsAffected = service.deleteGameById(game_id);
+        if (rowsAffected == 1){
+            return ResponseEntity.ok("Game with id: " + game_id + " deleted successfully.");
+        }
+        else {
+            return ResponseEntity.noContent().build();
+        }
     }
 }
