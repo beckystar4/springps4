@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 
 public class GameResponse {
-
     @JsonProperty
     private Long game_id;
 
