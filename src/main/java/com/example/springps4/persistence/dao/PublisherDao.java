@@ -122,13 +122,5 @@ public class PublisherDao extends AbstractDatabaseDao {
         queryParams.addValue("game_id", publisherRequest.getGame_id());
 
         return namedParameterJdbcTemplate.update(UPDATE_PUBLISHER_NAME, queryParams);
-
-//        try {
-//            // Attempt to insert the game into the database
-//            return namedParameterJdbcTemplate.update(UPDATE_PUBLISHER_NAME, queryParams);
-//        } catch (BadSqlGrammarException e) {
-//            System.out.println("Error");
-//            return 0; // Return 0 to indicate failure due to duplicate title
-//        }
     }
 }

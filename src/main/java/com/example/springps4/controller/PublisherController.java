@@ -92,12 +92,12 @@ public class PublisherController {
     public ResponseEntity<String> savePublisher(
             @RequestBody List<PublisherRequest> publisherRequests
     ){
-        if (publisherRequests == null) {
+        if (publisherRequests == null || publisherRequests.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("No games provided. Please provide at least one game.");
         }
         for (PublisherRequest publisherRequest : publisherRequests) {
-            if (publisherRequest.getPublisher() == null) {
+            if (publisherRequest.getPublisher() == null|| publisherRequest.getPublisher().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("Publisher must not be null.");
             }
@@ -115,12 +115,12 @@ public class PublisherController {
     public ResponseEntity<String> updatePublisherNameByGameId(
             @RequestBody List<PublisherRequest> publisherRequests
     ){
-        if (publisherRequests == null) {
+        if (publisherRequests == null || publisherRequests.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("No games provided. Please provide at least one game.");
+                    .body("No publishers provided. Please provide at least one publisher.");
         }
         for (PublisherRequest publisherRequest : publisherRequests) {
-            if (publisherRequest.getPublisher() == null) {
+            if (publisherRequest.getPublisher() == null || publisherRequest.getPublisher().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("Publisher must not be null.");
             }
