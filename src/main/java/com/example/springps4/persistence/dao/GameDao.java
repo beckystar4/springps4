@@ -223,8 +223,6 @@ public class GameDao extends AbstractDatabaseDao {
 
     public Integer insertGame(GameRequest gameRequest){
         MapSqlParameterSource queryParams = new MapSqlParameterSource();
-        GameResponse gameResponse = new GameResponse();
-
         String title = gameRequest.getTitle();
         queryParams.addValue("title", title);
 
