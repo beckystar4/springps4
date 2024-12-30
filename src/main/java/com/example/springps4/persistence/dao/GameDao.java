@@ -158,7 +158,6 @@ public class GameDao extends AbstractDatabaseDao {
         Integer copies_sold = updatedGameRequest.getMillions_of_copies_sold();
         LocalDate release_date = updatedGameRequest.getRelease_date();
 
-        // FIx isEmpty
         if((title != null) && (genres != null)
         && (copies_sold != null) && ((release_date != null))){
             queryParams.addValue("title", title);
@@ -201,14 +200,14 @@ public class GameDao extends AbstractDatabaseDao {
             if (copies_sold != null) {
                 queryParams.addValue("millions_of_copies_sold", copies_sold);
                 parametersToBeUpdated+=1;
-                if (namedParameterJdbcTemplate.update(UPDATE_GAME_GENRE,queryParams) > 0){
+                if (namedParameterJdbcTemplate.update(UPDATE_GAME_COPIES_SOLD,queryParams) > 0){
                     rowsAffected+=1;
                 }
             }
             if (release_date != null) {
                 queryParams.addValue("release_date", release_date);
                 parametersToBeUpdated += 1;
-                if (namedParameterJdbcTemplate.update(UPDATE_GAME_GENRE, queryParams) > 0) {
+                if (namedParameterJdbcTemplate.update(UPDATE_GAME_RELEASE_DATE, queryParams) > 0) {
                     rowsAffected += 1;
                 }
             }
