@@ -1,9 +1,11 @@
 package com.example.springps4.persistence.dao;
 
 import com.example.springps4.mapper.PublisherMapper;
+import com.example.springps4.model.request.PublisherRequest;
 import com.example.springps4.model.response.PublisherResponse;
 import com.example.springps4.persistence.dao.base.AbstractDatabaseDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +15,7 @@ import java.util.List;
 @Component
 public class PublisherDao extends AbstractDatabaseDao {
     private static final String SELECT_PUBLISHER_DETAILS = """
-             select * from publishers;
+             select * from publishers ORDER BY publisher_id ASC;
             """;
 
     private static final String SELECT_DISTINCT_PUBLISHERS = """
@@ -29,6 +31,18 @@ public class PublisherDao extends AbstractDatabaseDao {
             FROM publishers
             GROUP BY publisher
             ORDER BY publisher ASC;
+            """;
+
+    private static final String DELETE_PUBLISHER_BY_NAME = """
+            DELETE FROM publishers WHERE publisher=:publisher;
+            """;
+
+    private static final String INSERT_PUBLISHER = """
+            INSERT INTO publishers (publisher, game_id) VALUES (:publisher, :game_id);
+            """;
+
+    private static final String UPDATE_PUBLISHER_NAME = """
+            UPDATE publishers SET publisher=:publisher where game_id=:game_id;
             """;
 
     // Most Recent game by publisher
@@ -74,5 +88,47 @@ public class PublisherDao extends AbstractDatabaseDao {
                     return publisherResponse;
                 }
         );
+    }
+
+    public Integer deleteByPublisherName(String publisher){
+        MapSqlParameterSource queryParams = new MapSqlParameterSource();
+        queryParams.addValue("publisher", publisher);
+
+        if (namedParameterJdbcTemplate.update(DELETE_PUBLISHER_BY_NAME,queryParams) > 0){
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
+
+    public Integer insertPublishers(PublisherRequest publisherRequest){
+        MapSqlParameterSource queryParams = new MapSqlParameterSource();
+        queryParams.addValue("publisher", publisherRequest.getPublisher());
+        queryParams.addValue("game_id", publisherRequest.getGame_id());
+
+        try {
+            // Attempt to insert the game into the database
+            return namedParameterJdbcTemplate.update(INSERT_PUBLISHER, queryParams);
+        } catch (BadSqlGrammarException e) {
+            System.out.println("Error");
+            return 0; // Return 0 to indicate failure due to duplicate title
+        }
+    }
+
+    public Integer updatePublisherNameByGameId(PublisherRequest publisherRequest){
+        MapSqlParameterSource queryParams = new MapSqlParameterSource();
+        queryParams.addValue("publisher", publisherRequest.getPublisher());
+        queryParams.addValue("game_id", publisherRequest.getGame_id());
+
+        return namedParameterJdbcTemplate.update(UPDATE_PUBLISHER_NAME, queryParams);
+
+//        try {
+//            // Attempt to insert the game into the database
+//            return namedParameterJdbcTemplate.update(UPDATE_PUBLISHER_NAME, queryParams);
+//        } catch (BadSqlGrammarException e) {
+//            System.out.println("Error");
+//            return 0; // Return 0 to indicate failure due to duplicate title
+//        }
     }
 }

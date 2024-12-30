@@ -1,5 +1,7 @@
 package com.example.springps4.controller;
 
+import com.example.springps4.model.request.GameRequest;
+import com.example.springps4.model.request.PublisherRequest;
 import com.example.springps4.model.response.GameResponse;
 import com.example.springps4.model.response.PublisherResponse;
 import com.example.springps4.service.PublisherService;
@@ -70,5 +72,65 @@ public class PublisherController {
             }
         }
         return ResponseEntity.ok(counts);
+    }
+
+   //    http://localhost:8080/api/v1/publishers/?publisher=Sony+Interactive+Entertainment
+    @DeleteMapping("/")
+    public ResponseEntity<String> deleteGameByPublisherName(
+            @RequestParam String publisher
+    ){
+        int rowsAffected = service.deleteByPublisherName(publisher);
+        if (rowsAffected == 1){
+            return ResponseEntity.ok(publisher + " deleted successfully.");
+        }
+        else {
+            return ResponseEntity.noContent().build();
+        }
+    }
+
+    @PostMapping("/")
+    public ResponseEntity<String> savePublisher(
+            @RequestBody List<PublisherRequest> publisherRequests
+    ){
+        if (publisherRequests == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("No games provided. Please provide at least one game.");
+        }
+        for (PublisherRequest publisherRequest : publisherRequests) {
+            if (publisherRequest.getPublisher() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Publisher must not be null.");
+            }
+
+            System.out.println("Trying to save...");
+            if (service.insertPublisher(publisherRequest) <= 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Failed to save publisher details. Please try again.");
+            }
+        }
+        return ResponseEntity.ok("All publisher details were saved successfully.");
+    }
+
+    @PutMapping("/")
+    public ResponseEntity<String> updatePublisherNameByGameId(
+            @RequestBody List<PublisherRequest> publisherRequests
+    ){
+        if (publisherRequests == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("No games provided. Please provide at least one game.");
+        }
+        for (PublisherRequest publisherRequest : publisherRequests) {
+            if (publisherRequest.getPublisher() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Publisher must not be null.");
+            }
+
+            System.out.println("Trying to save...");
+            if (service.updatePublisherNameByGameId(publisherRequest) <= 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Failed to update publisher details. Please try again.");
+            }
+        }
+        return ResponseEntity.ok("All publisher details were updated successfully.");
     }
 }
