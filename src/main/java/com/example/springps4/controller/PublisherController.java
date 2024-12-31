@@ -46,7 +46,7 @@ public class PublisherController {
 
         if (gameCount != null) {
             // Return OK with the game count and a success message
-            return ResponseEntity.ok(publisher + "has " + gameCount + " number of games");
+            return ResponseEntity.ok(publisher + " has " + gameCount + " number of games");
         } else {
             // Return no content with a failure message
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
