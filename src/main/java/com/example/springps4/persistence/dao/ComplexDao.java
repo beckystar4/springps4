@@ -1,5 +1,6 @@
 package com.example.springps4.persistence.dao;
 
+import com.example.springps4.mapper.DeveloperMapper;
 import com.example.springps4.mapper.GameMapper;
 import com.example.springps4.mapper.PublisherMapper;
 import com.example.springps4.persistence.dao.base.AbstractDatabaseDao;
@@ -12,6 +13,7 @@ import javax.sql.DataSource;
 public class ComplexDao extends AbstractDatabaseDao {
     private final PublisherMapper publisherMapper;
     private final GameMapper gameMapper;
+    private final DeveloperMapper developerMapper;
 
     private static final String SELECT_GAME_TITLE_PUBLISHER = """
              select title, publisher from games inner join publishers USING(game_id);
@@ -30,9 +32,10 @@ public class ComplexDao extends AbstractDatabaseDao {
             """;
 
     @Autowired
-    public ComplexDao(DataSource dataSource, PublisherMapper publisherMapper, GameMapper gameMapper) {
+    public ComplexDao(DataSource dataSource, PublisherMapper publisherMapper, GameMapper gameMapper, DeveloperMapper developerMapper) {
         super(dataSource);  // Pass the dataSource to the superclass constructor
         this.publisherMapper = publisherMapper;
         this.gameMapper = gameMapper;
+        this.developerMapper = developerMapper;
     }
 }
