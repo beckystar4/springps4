@@ -46,3 +46,27 @@ The Complex Dao, Service, and Controller holds queries that span across the tabl
 To run a query, start the server by going to the Springps4Application class. Using Postman, you are able to send requests. 
  - Some queries allow you to send a ResponseBody which you can input into Postman in JSON format.
  - Other times, you can put the parameter directly in the path like so, http://localhost:8080/api/v1/?title=God+of+War
+
+**Active Endpoints**
+ - GET api/v1/games/{title} : Allows user to input title to get details on game. http://localhost:8080/api/v1/games/?title=God+of+War
+ - GET api/v1/games/id={game_id} : Allows user to input id to get details on game. http://localhost:8080/api/v1/games/?id=1
+ - GET api/v1/games : gets all game details
+ - GET api/v1/games/titles : gets all game titles
+ - GET api/v1/games/titles-copies-sold : gets all titles and how many copies they sold 
+ - GET api/v1/games/titles-release-date : gets all titles and their release dates
+ - GET api/v1/games/genres : gets all game genres
+ - POST api/v1/games/add-games : inserts game(s)
+ - PUT api/v1/games/{game_id} : Updates a game based on game_id. Depending on what is inputted in the response body, the query will update that information
+ - DELETE api/v1/games/{game_id} : Deletes a game based on game_id
+ - GET api/v1/publishers : Gets all publisher details
+ - GET api/v1/publishers/ : Gets distinct publishers names
+ - GET api/v1/publishers/number-of-games-specific : Gets publisher and their game count. /number-of-games-specific?publisher=Sony+Interactive+Entertainment
+ - PUT api/v1/publishers/ : Updates publisher by game_id
+ - POST api/v1/publishers/ : Inserts publisher(s)
+ - DELETE api/v1/publishers/ : Deletes publisher by game_id
+ - GET api/v1/developers : Gets all developers details
+ - GET api/v1/developers/ : Gets distinct developers names
+ - GET api/v1/developers/number-of-games-specific : Gets developers and their game count. /number-of-games-specific?publisher=Sony+Interactive+Entertainment
+ - PUT api/v1/developers/ : Updates developers by game_id
+ - POST api/v1/developers/ : Inserts developers(s)
+ - DELETE api/v1/developers/ : Deletes developers by game_id
