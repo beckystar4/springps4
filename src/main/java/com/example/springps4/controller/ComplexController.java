@@ -1,7 +1,9 @@
 package com.example.springps4.controller;
 
+import com.example.springps4.model.request.GameRequest;
 import com.example.springps4.service.ComplexService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -88,4 +90,90 @@ public class ComplexController {
         }
         return ResponseEntity.ok(result);
     }
+
+    //http://localhost:8080/api/v1/genres-pub?publisher=Square+Enix
+    @GetMapping("/genres-pub")
+    public ResponseEntity<String> getDistinctGenresPublisher(
+            @RequestParam String publisher
+    ){
+        List<String> details = service.getDistinctGenresPublisher(publisher);
+
+        if (publisher == null || publisher.isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Please provide required information: Publisher Name");
+        }
+
+        StringBuilder result = new StringBuilder( publisher + ": ");
+        for (String genre : details) {
+            result.append(genre).append(", ");  // Append each genre to the result
+        }
+
+        return ResponseEntity.ok(result.toString());
+    }
+
+    //http://localhost:8080/api/v1/genres-dev?developer=EA+DICE
+    @GetMapping("/genres-dev")
+    public ResponseEntity<String> getDistinctGenresDeveloper(
+            @RequestParam String developer
+    ){
+        List<String> details = service.getDistinctGenresDeveloper(developer);
+
+        if (developer == null || developer.isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Please provide required information: Developer Name");
+        }
+
+        StringBuilder result = new StringBuilder( developer + ": ");
+        for (String genre : details) {
+            result.append(genre).append(", ");  // Append each genre to the result
+        }
+
+        return ResponseEntity.ok(result.toString());
+    }
+
+    @GetMapping("/newest-game")
+    public ResponseEntity<String> getNewestGame(){
+        List<String> details = service.getNewestGame();
+
+        return ResponseEntity.ok(details.get(0));
+    }
+
+    @PostMapping("/")
+    public ResponseEntity<String> batchInsert(
+            @RequestBody GameRequest gameRequest,
+            @RequestParam String publisher,
+            @RequestParam String developer) {
+        System.out.println(gameRequest.getTitle());
+        System.out.println(publisher + " " + developer);
+        if (gameRequest == null ||
+                gameRequest.getTitle() == null || gameRequest.getTitle().isEmpty() ||
+                gameRequest.getRelease_date() == null || gameRequest.getRelease_date().toString().isEmpty() ||
+                publisher == null || publisher.isEmpty() ||
+                developer == null || developer.isEmpty()) {
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Please provide required information: Game Title, Game Release Date, Publisher Name, and Developer Name");
+        }
+
+        Integer batchInsert = service.batchInsert(gameRequest, publisher, developer);
+
+        if (batchInsert == 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Failed to save Game details. Please try again.");
+        }
+        else if (batchInsert == 1) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Failed to save Publisher details. Please try again.");
+        }
+        else if (batchInsert == 2) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Failed to save Developer details. Please try again.");
+        }else if (batchInsert == -100) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Failed. Please try again.");
+        }
+
+        return ResponseEntity.ok("All details were saved successfully.");
+    }
+
 }
