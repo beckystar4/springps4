@@ -158,58 +158,49 @@ public class GameDao extends AbstractDatabaseDao {
         Integer copies_sold = updatedGameRequest.getMillions_of_copies_sold();
         LocalDate release_date = updatedGameRequest.getRelease_date();
 
-        if((title != null) && (genres != null)
-        && (copies_sold != null) && ((release_date != null))){
+        if (title != null) { //update title
+            if(title.isEmpty()){
+                return 0;
+            }
             queryParams.addValue("title", title);
-            queryParams.addValue("genres", genres);
-            queryParams.addValue("millions_of_copies_sold", copies_sold);
-            queryParams.addValue("release_date", release_date);
+            parametersToBeUpdated+=1;
             try {
                 // Attempt to insert the game into the database
-                namedParameterJdbcTemplate.update(UPDATE_ALL_GAME_DETAILS,queryParams);
-                parametersToBeUpdated=4;
-                rowsAffected=4;
+                namedParameterJdbcTemplate.update(UPDATE_GAME_NAME,queryParams);
+                rowsAffected+=1;
             } catch (DuplicateKeyException e) {
                 // Handle the case where the title already exists
                 // Log the exception or handle it gracefully
                 System.out.println("Error: Game with Title already exists.");
-                return 0; // Return 0 to indicate failure due to duplicate title
+                return -100; // Return 0 to indicate failure due to duplicate title
             }
-        } else {
-            if (title != null) {
-                queryParams.addValue("title", title);
-                parametersToBeUpdated+=1;
-                try {
-                    // Attempt to insert the game into the database
-                    namedParameterJdbcTemplate.update(UPDATE_GAME_NAME,queryParams);
-                    rowsAffected+=1;
-                } catch (DuplicateKeyException e) {
-                    // Handle the case where the title already exists
-                    // Log the exception or handle it gracefully
-                    System.out.println("Error: Game with Title already exists.");
-                    return -100; // Return 0 to indicate failure due to duplicate title
-                }
+        }
+        if (genres != null) { //update genres
+            queryParams.addValue("genres", genres);
+            parametersToBeUpdated+=1;
+            if (namedParameterJdbcTemplate.update(UPDATE_GAME_GENRE,queryParams) > 0) {
+                rowsAffected += 1;
             }
-            if (genres != null) {
-                queryParams.addValue("genres", genres);
-                parametersToBeUpdated+=1;
-                if (namedParameterJdbcTemplate.update(UPDATE_GAME_GENRE,queryParams) > 0){
-                    rowsAffected+=1;
-                }
+        }
+        if (copies_sold != null) { //update copies_sold
+            queryParams.addValue("millions_of_copies_sold", copies_sold);
+            parametersToBeUpdated+=1;
+            if (namedParameterJdbcTemplate.update(UPDATE_GAME_COPIES_SOLD,queryParams) > 0){
+                rowsAffected+=1;
             }
-            if (copies_sold != null) {
-                queryParams.addValue("millions_of_copies_sold", copies_sold);
-                parametersToBeUpdated+=1;
-                if (namedParameterJdbcTemplate.update(UPDATE_GAME_COPIES_SOLD,queryParams) > 0){
-                    rowsAffected+=1;
-                }
-            }
-            if (release_date != null) {
+        }
+        System.out.println("Here1");
+        if (release_date != null) {
+            try {
                 queryParams.addValue("release_date", release_date);
                 parametersToBeUpdated += 1;
-                if (namedParameterJdbcTemplate.update(UPDATE_GAME_RELEASE_DATE, queryParams) > 0) {
-                    rowsAffected += 1;
-                }
+            } catch (IllegalArgumentException e) {
+                // Handle the error if the date format is incorrect
+                System.out.println("Invalid date format: " + release_date);
+                return 0;
+            }
+            if (namedParameterJdbcTemplate.update(UPDATE_GAME_RELEASE_DATE, queryParams) > 0) {
+                rowsAffected += 1;
             }
         }
 
@@ -219,6 +210,26 @@ public class GameDao extends AbstractDatabaseDao {
         else{
             return 0;
         }
+
+    // Update everything
+//        if((title != null) && (genres != null)
+//        && (copies_sold != null) && ((release_date != null))){
+//            queryParams.addValue("title", title);
+//            queryParams.addValue("genres", genres);
+//            queryParams.addValue("millions_of_copies_sold", copies_sold);
+//            queryParams.addValue("release_date", release_date);
+//            try {
+//                // Attempt to insert the game into the database
+//                namedParameterJdbcTemplate.update(UPDATE_ALL_GAME_DETAILS,queryParams);
+//                parametersToBeUpdated=4;
+//                rowsAffected=4;
+//            } catch (DuplicateKeyException e) {
+//                // Handle the case where the title already exists
+//                // Log the exception or handle it gracefully
+//                System.out.println("Error: Game with Title already exists.");
+//                return 0; // Return 0 to indicate failure due to duplicate title
+//            }
+//        } else {
     }
 
     public Integer insertGame(GameRequest gameRequest){

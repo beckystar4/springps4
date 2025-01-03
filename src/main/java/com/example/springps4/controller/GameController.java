@@ -97,9 +97,10 @@ public class GameController {
                     .body("No games provided. Please provide at least one game.");
         }
         for (GameRequest gameRequest : gameRequests) {
-            if (gameRequest.getTitle() == null && gameRequest.getRelease_date() == null) {
+            if (gameRequest.getTitle() == null || gameRequest.getTitle().isEmpty() || gameRequest.getRelease_date() == null
+            || gameRequest.getRelease_date().toString().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Title and Release Date must not be null.");
+                        .body("Title and Release Date must not be null or empty.");
             }
 
             System.out.println("Trying to save...");
@@ -123,16 +124,14 @@ public class GameController {
         int rowsAffected = service.updateGameDetails(game_id, updateGameRequest);
         if (rowsAffected == -100){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error. Possible causes: DuplicateKeyException .");
-        } else{
-            if (rowsAffected > 0){
-                return ResponseEntity.ok("Game details were updated successfully.");
-            }
-            else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Failed to Updated.");
-            }
+                    .body("Error. Possible causes: DuplicateKeyException.");
+        } else if (rowsAffected == 0){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Failure to save. ");
         }
+
+        return ResponseEntity.ok("Game details were updated successfully.");
+
     }
 
     // Will delete from Publishers and Developers
