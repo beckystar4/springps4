@@ -135,6 +135,7 @@ public class GameController {
         }
     }
 
+    // Will delete from Publishers and Developers
     @DeleteMapping("/{game_id}")
     public ResponseEntity<String> deleteGameByGameId(
             @PathVariable Long game_id
