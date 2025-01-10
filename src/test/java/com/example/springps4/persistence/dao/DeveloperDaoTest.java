@@ -3,12 +3,14 @@ package com.example.springps4.persistence.dao;
 import com.example.springps4.mapper.DeveloperMapper;
 import com.example.springps4.model.request.DeveloperRequest;
 import com.example.springps4.model.response.DeveloperResponse;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -41,6 +43,17 @@ class DeveloperDaoTest {
 
     private DeveloperResponse mockedDeveloperResponse;
 
+    private static final String SELECT_DISTINCT_DEVELOPERS = """
+            SELECT DISTINCT developer FROM developers ORDER BY developer ASC;
+            """;
+
+    private static final String NUMBER_OF_GAMES_GROUP_BY_DEVELOPER = """
+            SELECT developer, COUNT(game_id) AS game_count
+            FROM developers
+            GROUP BY developer
+            ORDER BY developer ASC;
+            """;
+
     @BeforeEach
     void setup(){
         underTest = new DeveloperDao(dataSource,developerMapper);
@@ -68,6 +81,19 @@ class DeveloperDaoTest {
 
     @Test
     void getDistinctDevelopers() {
+        // Given: Prepare mock data
+        List<String> mockedDevelopers = List.of("Naughty Dog", "Rockstar");
+
+        // When: Simulate the query execution and return the mocked genres list
+        when(jdbcTemplate.query(eq(SELECT_DISTINCT_DEVELOPERS), any(RowMapper.class)))
+                .thenReturn(mockedDevelopers);
+        // Call the method to test
+        List<String> actualResult = underTest.getDistinctDevelopers();
+
+        // Then: Assert the results
+        AssertionsForClassTypes.assertThat(actualResult).isNotNull();
+        AssertionsForClassTypes.assertThat(actualResult.size()).isEqualTo(2);
+        AssertionsForClassTypes.assertThat(actualResult).isSameAs(mockedDevelopers);
     }
 
     @Test
@@ -83,6 +109,22 @@ class DeveloperDaoTest {
 
     @Test
     void getNumberOfGamesGroupByDeveloper() {
+        // Given: Prepare mock data
+        List<DeveloperResponse> listOfDevelopers = new ArrayList<>();
+        DeveloperResponse developerResponse1 = new DeveloperResponse();
+        developerResponse1.setDeveloper("Rockstar");
+        developerResponse1.setGame_id(81); // game count for this publisher
+        listOfDevelopers.add(developerResponse1);
+        listOfDevelopers.add(mockedDeveloperResponse);
+
+        // When: Simulate the query execution and return the mocked genres list
+        when(jdbcTemplate.query(eq(NUMBER_OF_GAMES_GROUP_BY_DEVELOPER), any(RowMapper.class)))
+                .thenReturn(listOfDevelopers);
+        // Call the method to test
+        List<DeveloperResponse> actualResult = underTest.getNumberOfGamesGroupByDeveloper();
+
+        // Then: Assert the results
+        AssertionsForClassTypes.assertThat(actualResult).isNotNull();
     }
 
     @Test

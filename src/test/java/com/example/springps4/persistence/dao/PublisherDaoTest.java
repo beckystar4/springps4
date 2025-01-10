@@ -3,12 +3,14 @@ package com.example.springps4.persistence.dao;
 import com.example.springps4.mapper.PublisherMapper;
 import com.example.springps4.model.request.PublisherRequest;
 import com.example.springps4.model.response.PublisherResponse;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -19,9 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,13 +42,25 @@ class PublisherDaoTest {
     private PublisherMapper publisherMapper;
 
     private PublisherResponse mockedPublisherResponse;
+
+    private static final String SELECT_DISTINCT_PUBLISHERS = """
+            SELECT DISTINCT publisher FROM publishers ORDER BY publisher ASC;
+            """;
+
+    private static final String NUMBER_OF_GAMES_GROUP_BY_PUBLISHER = """
+            SELECT publisher, COUNT(game_id) AS game_count
+            FROM publishers
+            GROUP BY publisher
+            ORDER BY publisher ASC;
+            """;
+
     @BeforeEach
     void setup(){
         underTest = new PublisherDao(dataSource,publisherMapper);
         ReflectionTestUtils.setField(underTest,"jdbcTemplate", jdbcTemplate);
         ReflectionTestUtils.setField(underTest,"namedParameterJdbcTemplate", namedParameterJdbcTemplate);
         mockedPublisherResponse = new PublisherResponse();
-        mockedPublisherResponse.setPublisher("Naughty Dog");
+        mockedPublisherResponse.setPublisher("Rockstar");
         mockedPublisherResponse.setGame_id(80);
     }
 
@@ -69,6 +81,19 @@ class PublisherDaoTest {
 
     @Test
     void getDistinctPublishers() {
+        // Given: Prepare mock data
+        List<String> mockedPublishers = List.of("Naughty Dog", "Rockstar");
+
+        // When: Simulate the query execution and return the mocked genres list
+        when(jdbcTemplate.query(eq(SELECT_DISTINCT_PUBLISHERS), any(RowMapper.class)))
+                .thenReturn(mockedPublishers);
+        // Call the method to test
+        List<String> actualResult = underTest.getDistinctPublishers();
+
+        // Then: Assert the results
+        AssertionsForClassTypes.assertThat(actualResult).isNotNull();
+        AssertionsForClassTypes.assertThat(actualResult.size()).isEqualTo(2);
+        AssertionsForClassTypes.assertThat(actualResult).isSameAs(mockedPublishers);
     }
 
     @Test
@@ -84,30 +109,22 @@ class PublisherDaoTest {
 
     @Test
     void getNumberOfGamesGroupByPublisher() {
-//        List<PublisherResponse> listOfPublishers = new ArrayList<>();
-//        PublisherResponse publisherResponse1 = new PublisherResponse();
-//        publisherResponse1.setPublisher("Naughty Dog");
-//        publisherResponse1.setGame_id(81); // game count for this publisher
-//        listOfPublishers.add(publisherResponse1);
-//        listOfPublishers.add(mockedPublisherResponse);
-//
-//        lenient().when(jdbcTemplate.query(
-//                anyString(),  // this matches any SQL string
-//                eq(publisherMapper)  // matches the RowMapper
-//        )).thenReturn(listOfPublishers);
-//
-//        List<PublisherResponse> actualResponse = underTest.getNumberOfGamesGroupByPublisher();
-//
-//        System.out.println("Actual response size: " + actualResponse.size());
-//        if (!actualResponse.isEmpty()) {
-//            System.out.println("Publisher: " + actualResponse.get(0).getPublisher());
-//            System.out.println("Game count: " + actualResponse.get(0).getGame_id());
-//        }
-//
-//        assertThat(actualResponse).isNotNull();
-//        assertThat(actualResponse.size()).isEqualTo(1);
-//        assertThat(actualResponse.get(0).getPublisher()).isEqualTo("Naughty Dog");
-//        assertThat(actualResponse.get(0).getGame_id()).isEqualTo(81);
+        // Given: Prepare mock data
+        List<PublisherResponse> listOfPublishers = new ArrayList<>();
+        PublisherResponse publisherResponse1 = new PublisherResponse();
+        publisherResponse1.setPublisher("Rockstar");
+        publisherResponse1.setGame_id(81); // game count for this publisher
+        listOfPublishers.add(publisherResponse1);
+        listOfPublishers.add(mockedPublisherResponse);
+
+        // When: Simulate the query execution and return the mocked genres list
+        when(jdbcTemplate.query(eq(NUMBER_OF_GAMES_GROUP_BY_PUBLISHER), any(RowMapper.class)))
+                .thenReturn(listOfPublishers);
+        // Call the method to test
+        List<PublisherResponse> actualResult = underTest.getNumberOfGamesGroupByPublisher();
+
+        // Then: Assert the results
+        AssertionsForClassTypes.assertThat(actualResult).isNotNull();
     }
 
     @Test
