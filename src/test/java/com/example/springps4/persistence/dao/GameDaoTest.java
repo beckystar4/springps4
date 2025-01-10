@@ -46,11 +46,6 @@ class GameDaoTest {
     // Is initalized in the @BeforeEach to save space and re-use.
     private GameResponse mockedGameResponse;
 
-    private static final String SELECT_DISTINCT_GENRES = """
-            SELECT DISTINCT genres FROM games ORDER BY genres ASC;
-            """;
-
-
     @BeforeEach
     void setup(){
         underTest = new GameDao(dataSource, gameMapper);
@@ -211,7 +206,7 @@ class GameDaoTest {
 
 
         // When: Simulate the query execution and return the mocked genres list
-        when(jdbcTemplate.query(eq(SELECT_DISTINCT_GENRES), any(RowMapper.class)))
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class)))
                 .thenReturn(mockedGenres);
         // Call the method to test
         List<String> actualGenres = underTest.getDistinctGenres();

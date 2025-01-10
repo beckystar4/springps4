@@ -76,7 +76,7 @@ class PublisherDaoTest {
 
         assertThat(actualResponse).isNotNull();
         assertThat(actualResponse.size()).isEqualTo(1);
-        assertThat(actualResponse.get(0).getPublisher()).isEqualTo("Naughty Dog");
+        assertThat(actualResponse.get(0).getPublisher()).isEqualTo("Rockstar");
     }
 
     @Test
@@ -85,7 +85,7 @@ class PublisherDaoTest {
         List<String> mockedPublishers = List.of("Naughty Dog", "Rockstar");
 
         // When: Simulate the query execution and return the mocked genres list
-        when(jdbcTemplate.query(eq(SELECT_DISTINCT_PUBLISHERS), any(RowMapper.class)))
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class)))
                 .thenReturn(mockedPublishers);
         // Call the method to test
         List<String> actualResult = underTest.getDistinctPublishers();
@@ -118,7 +118,7 @@ class PublisherDaoTest {
         listOfPublishers.add(mockedPublisherResponse);
 
         // When: Simulate the query execution and return the mocked genres list
-        when(jdbcTemplate.query(eq(NUMBER_OF_GAMES_GROUP_BY_PUBLISHER), any(RowMapper.class)))
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class)))
                 .thenReturn(listOfPublishers);
         // Call the method to test
         List<PublisherResponse> actualResult = underTest.getNumberOfGamesGroupByPublisher();

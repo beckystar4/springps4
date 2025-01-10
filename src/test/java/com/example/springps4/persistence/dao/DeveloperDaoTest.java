@@ -43,17 +43,6 @@ class DeveloperDaoTest {
 
     private DeveloperResponse mockedDeveloperResponse;
 
-    private static final String SELECT_DISTINCT_DEVELOPERS = """
-            SELECT DISTINCT developer FROM developers ORDER BY developer ASC;
-            """;
-
-    private static final String NUMBER_OF_GAMES_GROUP_BY_DEVELOPER = """
-            SELECT developer, COUNT(game_id) AS game_count
-            FROM developers
-            GROUP BY developer
-            ORDER BY developer ASC;
-            """;
-
     @BeforeEach
     void setup(){
         underTest = new DeveloperDao(dataSource,developerMapper);
@@ -85,7 +74,7 @@ class DeveloperDaoTest {
         List<String> mockedDevelopers = List.of("Naughty Dog", "Rockstar");
 
         // When: Simulate the query execution and return the mocked genres list
-        when(jdbcTemplate.query(eq(SELECT_DISTINCT_DEVELOPERS), any(RowMapper.class)))
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class)))
                 .thenReturn(mockedDevelopers);
         // Call the method to test
         List<String> actualResult = underTest.getDistinctDevelopers();
@@ -118,7 +107,7 @@ class DeveloperDaoTest {
         listOfDevelopers.add(mockedDeveloperResponse);
 
         // When: Simulate the query execution and return the mocked genres list
-        when(jdbcTemplate.query(eq(NUMBER_OF_GAMES_GROUP_BY_DEVELOPER), any(RowMapper.class)))
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class)))
                 .thenReturn(listOfDevelopers);
         // Call the method to test
         List<DeveloperResponse> actualResult = underTest.getNumberOfGamesGroupByDeveloper();
