@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -44,6 +45,11 @@ class GameDaoTest {
 
     // Is initalized in the @BeforeEach to save space and re-use.
     private GameResponse mockedGameResponse;
+
+    private static final String SELECT_DISTINCT_GENRES = """
+            SELECT DISTINCT genres FROM games ORDER BY genres ASC;
+            """;
+
 
     @BeforeEach
     void setup(){
@@ -203,18 +209,17 @@ class GameDaoTest {
         // Given: Prepare mock data
         List<String> mockedGenres = List.of("Action", "Adventure", "Platform");
 
-        String query = "SELECT DISTINCT genres FROM games ORDER BY genres ASC;";
 
         // When: Simulate the query execution and return the mocked genres list
-        when(jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("genres")))
+        when(jdbcTemplate.query(eq(SELECT_DISTINCT_GENRES), any(RowMapper.class)))
                 .thenReturn(mockedGenres);
         // Call the method to test
         List<String> actualGenres = underTest.getDistinctGenres();
 
         // Then: Assert the results
         assertThat(actualGenres).isNotNull();
-//        assertThat(actualGenres.size()).isEqualTo(3);
-//        assertThat(actualGenres).isSameAs(mockedGenres);
+        assertThat(actualGenres.size()).isEqualTo(3);
+        assertThat(actualGenres).isSameAs(mockedGenres);
     }
 
     @Test
