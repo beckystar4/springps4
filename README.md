@@ -4,13 +4,15 @@ Project Overview:
 This project includes shelll scripts to manage the database and test data along with the actual Java files. 
 
 **Database Overview:**
-The database is comprised of three tables: _**Games**, **Publishers**, and **Developers**._ The Publishers and Developers tables have a foreign key constraint linking them to the Games table. 
+The database is comprised of three tables: _**Games**, **Publishers**, and **Developers**._ The Publishers and Developers tables have a foreign key constraint linking them to the Games table.
 
 Games columns: game_id, title, millions_of_copies_sold, genres, release_date
 
 Publishers columns: publisher_id, publisher, game_id
 
 Developers columns: developer_id, developer, game_id
+
+<img width="990" alt="Screenshot 2025-01-10 at 9 27 52 AM" src="https://github.com/user-attachments/assets/0e5f20d0-b2c0-4745-94f6-5f0387b63e1d" />
 
 **Setting up the Database:**
 To use the script files, you must have Postgres installed. On Mac, I used Postgres.app. 
