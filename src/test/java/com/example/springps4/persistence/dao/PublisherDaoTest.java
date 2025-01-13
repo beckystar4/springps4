@@ -43,17 +43,6 @@ class PublisherDaoTest {
 
     private PublisherResponse mockedPublisherResponse;
 
-    private static final String SELECT_DISTINCT_PUBLISHERS = """
-            SELECT DISTINCT publisher FROM publishers ORDER BY publisher ASC;
-            """;
-
-    private static final String NUMBER_OF_GAMES_GROUP_BY_PUBLISHER = """
-            SELECT publisher, COUNT(game_id) AS game_count
-            FROM publishers
-            GROUP BY publisher
-            ORDER BY publisher ASC;
-            """;
-
     @BeforeEach
     void setup(){
         underTest = new PublisherDao(dataSource,publisherMapper);
